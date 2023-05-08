@@ -217,3 +217,27 @@ for instruction in instructions:
 		stacks[to_stack].append(crate)
 
 print(getStackEnds())
+
+###########################
+#                         #
+#   Day 6 tuning trouble  #
+#   ###################   #
+#                         #
+###########################
+
+####start-of-packet marker is indicated by the first time four characters are all different.
+with open(sys.argv[1]) as file:
+	input=file.read()
+####Set index at character4, check if characters are all different, if not move index by 1, check again.
+for i in range(4, len(input)):
+####Use set to return only unique characters	
+	s=set(input[(i-4):i])
+	if len(s)==4:
+		print(s,i)
+		break
+
+for i in range(14, len(input)):
+	s=set(input[(i-14):i])
+	if len(s)==14:
+		print(s,i)
+		break
