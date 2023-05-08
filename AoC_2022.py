@@ -95,4 +95,125 @@ for x in range(0, len(data),3):
 
 print (count) 
 
+#########################
+                        #
+  Day 4 camp cleanup    #
+  ##################    #
+                        #
+#########################
 
+
+###Open and split data 
+data=open(sys.argv[1]).read().strip().split("\n")
+
+####Find overlaps 
+overlaps=0
+for x in data:
+	f,s=x.split(",")
+#	print (f,s)
+	firstval=[int(y) for y in f.split("-")]
+	secondval=[int(y) for y in s.split("-")]
+	#print (firstval, secondval)
+	if firstval[0] <= secondval[0] and firstval[1] >= secondval[1]:
+		overlaps+=1
+	elif secondval[0] <= firstval[0] and secondval[1] >= firstval[1]:
+		overlaps+=1
+
+print (overlaps)	
+
+####(Part2)
+###Find overlaps in pairs of data 
+overlaps=0
+for x in data:
+	f,s=x.split(",")
+	firstval=[int(y) for y in f.split("-")]
+	secondval=[int(y) for y in s.split("-")]
+	if firstval[0] in range(secondval[0], secondval[1]+1) or firstval[1] in range(secondval[0], secondval[1]+1):
+		overlaps+=1
+	elif secondval[0] in range(firstval[0], firstval[1]+1) or secondval[1] in range(firstval[0], firstval[1]+1):
+		overlaps+=1
+
+print (overlaps)    
+
+##########################
+#                        #
+#   Day 5 crate moving   #
+#   ##################   #
+#                        #
+##########################
+
+####Open data and spit by linebreak put top list in stack strings and bottom list in instructions  
+with open(sys.argv[1]) as file:
+	stack_strings,instructions=(i.splitlines() for i in file.read().strip("\n").split("\n\n"))
+
+####Store crate values (stack strings[-1]) in dict as key and stacks is list and replace empty spaces 
+stacks={int(digit):[] for digit in stack_strings[-1].replace(" ","")}
+
+###Check stacks 
+def displaystacks():
+	print("\n\nStacks:\n")
+	for stack in stacks:
+		print(stack,stacks[stack])
+	print("\n")
+
+#displaystacks()
+
+####Find indexes of crate numbers to allow assignent of crate characters later 
+indexes=[index for index, char in enumerate(stack_strings[-1]) if char !=" "]
+
+####Load stacks characters into dict, use insert to add to beginning of list 
+def loadstacks():
+	for string in stack_strings[:-1]:
+		stack_num=1
+		for index in indexes:
+			if string[index] != " ":
+				stacks[stack_num].insert(0,string[index])
+			stack_num+=1
+
+def emptystacks():
+	for stack_num in stacks:
+		stacks[stack_num].clear()
+
+def getStackEnds():
+	answer=""
+	for stack in stacks:
+		answer+=stacks[stack][-1]
+	return answer
+
+
+loadstacks()
+#emptystacks()
+#displaystacks()
+
+for instruction in instructions:
+	instruction=instruction.replace("move","").replace("from ","").replace("to ","").strip().split(" ")
+	instruction=[int(i) for i in instruction]
+	crates=instruction[0]
+	from_stack=instruction[1]
+	to_stack=instruction[2]
+	for crate in range(crates):
+		crate_removed=stacks[from_stack].pop()
+		stacks[to_stack].append(crate_removed)
+
+#Part 1 answer
+print(getStackEnds())
+
+####(Part2)
+emptystacks()
+loadstacks()
+
+for instruction in instructions:
+	instruction=instruction.replace("move","").replace("from ","").replace("to ","").strip().split(" ")
+	instruction=[int(i) for i in instruction]
+	crates=instruction[0]
+	from_stack=instruction[1]
+	to_stack=instruction[2]
+####Get a list of how many crates to remove, from the end so - and : to go to the end	
+	crates_to_remove=stacks[from_stack][-crates:]
+####Remove crates from the beginning up to crated to remove
+	stacks[from_stack]=stacks[from_stack][:-crates]
+####Add crates to a different stack 
+	for crate in crates_to_remove:
+		stacks[to_stack].append(crate)
+
+print(getStackEnds())
